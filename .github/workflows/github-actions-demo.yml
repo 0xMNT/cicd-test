@@ -2,10 +2,17 @@ name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  deploy:
     runs-on: alpine
-    - shell: bash
-    env:
-    ssh_key: ${{ ssh_key }}
-    run: |
-      ssh -o StrictHostKeyChecking=no root@5.75.241.59 -i id.rsa "echo 'Test 123'"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Decrypt SSH private key
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          armored-key: ${{ secrets.ssh_key }}
+
+      - name: SSH into server and execute command
+        run: |
+          ssh -o StrictHostKeyChecking=no root@5.75.241.59 -i id.rsa "echo 'Hello World'"
